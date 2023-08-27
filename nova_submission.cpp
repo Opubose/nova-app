@@ -24,7 +24,7 @@ int main(const int argc, const char *argv[])
 {
     try
     {
-        if (argc != 2)  // Only the path to the input.csv file should be provided as an argument
+        if (argc != 2)  // Only one argument (the path to the input.csv file) should be provided, along with the name of the executable
         {
             throw std::invalid_argument("Invalid number of arguments provided. Expected value of argc = 2.\nActual value = " + std::to_string(argc) + ".\nUSAGE: ./<executable name> <file path>");
         }
