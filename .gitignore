@@ -33,3 +33,5 @@
 
 # Input/Output files
 *.csv
+
+bin/
