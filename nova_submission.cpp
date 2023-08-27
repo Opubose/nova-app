@@ -3,7 +3,6 @@
 #include <string>
 #include <vector>
 #include <sstream>
-#include <stdexcept>
 
 const std::string OUTFILEPATH = "output.csv";
 
@@ -25,7 +24,10 @@ int main(const int argc, const char *argv[])
     {
         if (argc != 2)  // Only one argument (the path to the input.csv file) should be provided, along with the name of the executable
         {
-            throw std::invalid_argument("Invalid number of arguments provided. Expected value of argc = 2.\nActual value = " + std::to_string(argc) + ".\nUSAGE: ./<executable name> <file path>");
+            throw std::invalid_argument("Invalid number of arguments provided. "
+                                        "Expected value of argc = 2.\n"
+                                        "Actual value = " + std::to_string(argc) + "."
+                                        "\nUSAGE: ./<executable name> <file path>");
         }
 
         std::vector<point3> points = readFile(std::string(argv[1]));
@@ -54,7 +56,9 @@ std::vector<point3> readFile(const std::string &filepath)
 
     if (!pointcloud)
     {
-        throw std::domain_error("Invalid file path - \"" + filepath + "\" - provided. Please check your file path and make sure that the file actually exists.");
+        throw std::domain_error("Invalid file path - \"" + filepath + "\" - provided. "
+                                "Please check your file path and make sure that the file "
+                                "actually exists.");
     }
 
     std::vector<point3> points;
