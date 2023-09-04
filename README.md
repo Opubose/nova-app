@@ -25,6 +25,8 @@ I was waiting for you to ask that.
 
     `bin/a.out <path to your input.csv file>`
 
-    Obviously, replace `<path to your input.csv file>` with the actual path to the csv file. I usually keep that in the same directory as my source code.
+    Obviously, replace `<path to your input.csv file>` with the actual path to the `csv` file. I usually keep that in the same directory as my source code.
+
+4. If everything went according to plan, you'll be able to see a freshly written `output.csv` file in the project directory!
 
 # That was some mighty fine downsampling. Thank you!
