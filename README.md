@@ -20,13 +20,11 @@ I was waiting for you to ask that.
     `g++ -std=c++17 -O3 'Agastya Bose.cpp' -o bin/a.out`
 
     (*Hint*: The `-std=c++17` flag can be set to any valid C++ version >= 17)
-
 3. Run the compiled binary from the previous step by typing the following command in your terminal:
 
     `bin/a.out <path to your input.csv file>`
 
     Obviously, replace `<path to your input.csv file>` with the actual path to the `csv` file. I usually keep that in the same directory as my source code.
-
 4. If everything went according to plan, you'll be able to see a freshly written `output.csv` file in the project directory!
 
 # That was some mighty fine downsampling. Thank you!
