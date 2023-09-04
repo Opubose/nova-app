@@ -16,6 +16,11 @@ struct point3
     float x, y, z;
 
     point3(const double x_, const double y_, const double z_) : x(x_), y(y_), z(z_) {}
+    friend std::ostream &operator<<(std::ostream &out, const point3 &p)
+    {
+        out << p.x << ',' << p.y << ',' << p.z;
+        return out;
+    }
 };
 
 std::vector<point3> readFile(const std::string&);
@@ -34,8 +39,10 @@ int main(const int argc, const char *argv[])
                                         "USAGE: <executable path> <input file path>");
         }
 
-        std::vector<point3> points = readFile(argv[1]);
-        std::vector<point3> downsampled_points = downsample(points);
+        const std::vector<point3> points = readFile(argv[1]);
+
+        const std::vector<point3> downsampled_points = downsample(points);
+
         writeFile(downsampled_points);
     }
     catch (const std::exception &e)
@@ -84,7 +91,7 @@ std::vector<point3> readFile(const std::string &filepath)
     }
     pointcloud.close();
 
-    std::cout << "The original pointcloud has " << points.size() << " points.\n\n";
+    std::cout << "The original pointcloud has " << points.size() << " points.\n\n"; // Debug info
 
     return points;  // I love return-value optimization
 }
@@ -99,8 +106,12 @@ std::vector<point3> downsample(const std::vector<point3> &points)
     std::vector<point3> lesser_points;
 
     const float VOXELSIZE = 0.01f;  // Change this as needed. A greater voxel size tends to give a coarser downsample (less points overall) while a lesser voxel size tends to give a finer downsample (more points overall).
-    std::map<std::tuple<int, int, int>, std::vector<point3>> voxelmap;  // Voxel grid
+    std::map<std::tuple<int, int, int>, std::vector<point3>> voxelgrid;
     unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();    // Seed for the random number engine
+
+    /*
+     * I would have chosen an unordered_map instead of a map to implement the voxel grid because of the amortized constant-time access, however I didn't want to write a special hash function for it.
+     */
 
     for (const point3 &point : points)
     {
@@ -109,10 +120,10 @@ std::vector<point3> downsample(const std::vector<point3> &points)
         const int voxel_y = static_cast<int>(round(point.y / VOXELSIZE));
         const int voxel_z = static_cast<int>(round(point.z / VOXELSIZE));
 
-        voxelmap[{voxel_x, voxel_y, voxel_z}].push_back(point); // Distributing all the points from the cloud to a voxel grid
+        voxelgrid[{voxel_x, voxel_y, voxel_z}].push_back(point); // Distributing all the points from the cloud to a voxel grid
     }
 
-    for (const auto &voxel : voxelmap)  // For each voxel...
+    for (const auto &voxel : voxelgrid)  // For each voxel...
     {
         const std::vector<point3> &voxel_points = voxel.second; // Takes the vector of points in the current voxel
         if (!voxel_points.empty())
@@ -121,6 +132,7 @@ std::vector<point3> downsample(const std::vector<point3> &points)
              * The below function will select a point at random from voxel_points and will put it in lesser_points. Uses the mersenne twister engine to remove bias from the sampling.
              */
             // CAUTION: std::sample needs C++17 or above!
+
             std::sample(voxel_points.begin(),
                         voxel_points.end(),
                         std::back_inserter(lesser_points),
@@ -129,7 +141,7 @@ std::vector<point3> downsample(const std::vector<point3> &points)
         }
     }
 
-    std::cout << "The downsampled pointcloud has " << lesser_points.size() << " points.\n\n";
+    std::cout << "The downsampled pointcloud has " << lesser_points.size() << " points.\n\n";   // Debug info
 
     return lesser_points;
 }
@@ -146,7 +158,7 @@ void writeFile(const std::vector<point3> &downsampled_points)
 
     for (const point3 &p : downsampled_points)
     {
-        downsampled << p.x << ',' << p.y << ',' << p.z << '\n';
+        downsampled << p << '\n';
     }
     
     downsampled.close();
