@@ -109,7 +109,7 @@ std::vector<point3> downsample(const std::vector<point3> &points)
         const int voxel_y = static_cast<int>(round(point.y / VOXELSIZE));
         const int voxel_z = static_cast<int>(round(point.z / VOXELSIZE));
 
-        voxelmap[{voxel_x, voxel_y, voxel_z}].push_back(point); // Distributing all the points from the cloud in a voxel grid
+        voxelmap[{voxel_x, voxel_y, voxel_z}].push_back(point); // Distributing all the points from the cloud to a voxel grid
     }
 
     for (const auto &voxel : voxelmap)  // For each voxel...
@@ -118,9 +118,9 @@ std::vector<point3> downsample(const std::vector<point3> &points)
         if (!voxel_points.empty())
         {
             /*
-             * The below function will select a point at random from voxel_points and will put it in lesser_points. Uses the mersenne twister to remove bias from the sampling.
+             * The below function will select a point at random from voxel_points and will put it in lesser_points. Uses the mersenne twister engine to remove bias from the sampling.
              */
-            // CAUTION: std::sample needs C++17 and above!
+            // CAUTION: std::sample needs C++17 or above!
             std::sample(voxel_points.begin(),
                         voxel_points.end(),
                         std::back_inserter(lesser_points),
