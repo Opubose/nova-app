@@ -27,4 +27,4 @@ I was waiting for you to ask that.
 
     Obviously, replace `<path to your input.csv file>` with the actual path to the csv file. I usually keep that in the same directory as my source code.
 
-# Thank you!
+# That was some mighty fine downsampling. Thank you!
