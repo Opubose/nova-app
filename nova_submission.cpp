@@ -52,7 +52,7 @@ int main(const int argc, const char *argv[])
  * Reads the input file
  * @param filepath: the path to the input file as a string
  * @throws an std::domain_error() if no file exists at the given file path or if the path is invalid
- * @returns an std::vector of all the 3D points read from the input file
+ * @returns a vector of all the 3D points read from the input file
  */
 std::vector<point3> readFile(const std::string &filepath)
 {
@@ -89,28 +89,38 @@ std::vector<point3> readFile(const std::string &filepath)
     return points;  // I love return-value optimization
 }
 
+/**
+ * Downsamples the points read from the input file. The process used to downsample involves distributing all the points in a voxel grid and randomly choosing a point from each voxel.
+ * @param points: the vector of all points read from the input file
+ * @returns a vector of randomly chosen points from each voxel in the voxel grid
+ */
 std::vector<point3> downsample(const std::vector<point3> &points)
 {
     std::vector<point3> lesser_points;
 
-    const float VOXELSIZE = 0.01f;
-    std::map<std::tuple<int, int, int>, std::vector<point3>> voxelmap;
-    unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
+    const float VOXELSIZE = 0.01f;  // Change this as needed. A greater voxel size tends to give a coarser downsample (less points overall) while a lesser voxel size tends to give a finer downsample (more points overall).
+    std::map<std::tuple<int, int, int>, std::vector<point3>> voxelmap;  // Voxel grid
+    unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();    // Seed for the random number engine
 
     for (const point3 &point : points)
     {
+        // Voxels are discrete structures
         const int voxel_x = static_cast<int>(round(point.x / VOXELSIZE));
         const int voxel_y = static_cast<int>(round(point.y / VOXELSIZE));
         const int voxel_z = static_cast<int>(round(point.z / VOXELSIZE));
 
-        voxelmap[{voxel_x, voxel_y, voxel_z}].push_back(point);
+        voxelmap[{voxel_x, voxel_y, voxel_z}].push_back(point); // Distributing all the points from the cloud in a voxel grid
     }
 
-    for (const auto &voxel : voxelmap)
+    for (const auto &voxel : voxelmap)  // For each voxel...
     {
-        const std::vector<point3> &voxel_points = voxel.second;
+        const std::vector<point3> &voxel_points = voxel.second; // Takes the vector of points in the current voxel
         if (!voxel_points.empty())
         {
+            /*
+             * The below function will select a point at random from voxel_points and will put it in lesser_points. Uses the mersenne twister to remove bias from the sampling.
+             */
+            // CAUTION: std::sample needs C++17 and above!
             std::sample(voxel_points.begin(),
                         voxel_points.end(),
                         std::back_inserter(lesser_points),
@@ -124,9 +134,13 @@ std::vector<point3> downsample(const std::vector<point3> &points)
     return lesser_points;
 }
 
+/**
+ * Writes to the output file
+ * @param downsampled_points: the vector of downsampled points from the downsample() function
+ */
 void writeFile(const std::vector<point3> &downsampled_points)
 {
-    const std::string OUTFILEPATH = "output.csv";
+    const std::string OUTFILEPATH = "output.csv";   // Change this as needed
     std::ofstream downsampled(OUTFILEPATH);
     downsampled << "x,y,z\n";    // Writing the headers
 
